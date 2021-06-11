@@ -24,6 +24,12 @@ namespace AllTheExtras
         public EffectList buildWood;
         public EffectList buildTorch;
         public AudioSource torchVol;
+        public AudioSource bonfireVol;
+        public EffectList breakStone;
+        public EffectList breakWood;
+        public EffectList breakTorch;
+        public EffectList hitTorch;
+        public EffectList hitWoodStone;
 
 
         private void Awake()
@@ -48,13 +54,24 @@ namespace AllTheExtras
                 var vfxwood = PrefabManager.Cache.GetPrefab<GameObject>("vfx_Place_wood_wall");
                 var sfxmetal = PrefabManager.Cache.GetPrefab<GameObject>("sfx_build_hammer_metal");
                 var vfxmetal = PrefabManager.Cache.GetPrefab<GameObject>("vfx_Place_wood_pole");
-                 
+                var vfxmetalbreak = PrefabManager.Cache.GetPrefab<GameObject>("vfx_HitSparks");
+                var sfxwoodbreak = PrefabManager.Cache.GetPrefab<GameObject>("sfx_wood_destroyed");
+                var sfxstonebreak = PrefabManager.Cache.GetPrefab<GameObject>("sfx_rock_destroyed");
+                var vfxstonebreak = PrefabManager.Cache.GetPrefab<GameObject>("vfx_RockDestroyed");
+                var vfxbreak = PrefabManager.Cache.GetPrefab<GameObject>("vfx_SawDust");
+                var sfxstonehit = PrefabManager.Cache.GetPrefab<GameObject>("sfx_rock_hit");
 
 
                 
                 buildStone = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxstone }, new EffectList.EffectData { m_prefab = vfxstone } } };
                 buildWood = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxwood }, new EffectList.EffectData { m_prefab = vfxwood } } };
                 buildTorch = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxmetal }, new EffectList.EffectData { m_prefab = vfxmetal } } };
+                breakStone = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxstonebreak }, new EffectList.EffectData { m_prefab = vfxstonebreak } } };
+                breakWood = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxwoodbreak }, new EffectList.EffectData { m_prefab = vfxbreak } } };
+                breakTorch = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxwoodbreak }, new EffectList.EffectData { m_prefab = vfxmetalbreak } } };
+                hitTorch = new EffectList { m_effectPrefabs = new EffectList.EffectData[1] { new EffectList.EffectData { m_prefab = vfxmetalbreak } } };
+                hitWoodStone = new EffectList { m_effectPrefabs = new EffectList.EffectData[1] { new EffectList.EffectData { m_prefab = vfxbreak } } };
+
 
                 Jotunn.Logger.LogMessage("Loaded Game VFX and SFX");
 
@@ -64,7 +81,7 @@ namespace AllTheExtras
                 LoadWindows();
                 LoadBonfire();
                 torchVol.outputAudioMixerGroup = AudioMan.instance.m_ambientMixer;
-               
+                bonfireVol.outputAudioMixerGroup = AudioMan.instance.m_ambientMixer;
                 
             }
             catch (Exception ex)
@@ -107,7 +124,9 @@ namespace AllTheExtras
             //if (AudioMan.instance == null) Jotunn.Logger.LogError("lolwut");
             //else torchVol.outputAudioMixerGroup = mixer;
 
-
+            var torchBreak = torchFab.GetComponent<WearNTear>();
+            torchBreak.m_destroyedEffect = breakTorch;
+            torchBreak.m_hitEffect = hitTorch;
 
 
             //torchVol.outputAudioMixerGroup
@@ -166,6 +185,10 @@ namespace AllTheExtras
                     }
 
                 });
+            var winsBreak = windowsFab.GetComponent<WearNTear>();
+            winsBreak.m_destroyedEffect = breakWood;
+            winsBreak.m_hitEffect = hitWoodStone;
+
             var winsEffect = windowsFab.GetComponent<Piece>();
             winsEffect.m_placeEffect = buildWood;
             PieceManager.Instance.AddPiece(windows);
@@ -182,10 +205,20 @@ namespace AllTheExtras
                     PieceTable = "_HammerPieceTable",
                     Requirements = new[]
                     {
-                        new RequirementConfig { Item = "stone", Amount = 1, Recover = true }
+                        new RequirementConfig { Item = "Stone", Amount = 1, Recover = true }
                     }
 
                 });
+            bonfireVol = bonfireFab.AddComponent<AudioSource>();
+            bonfireVol.clip = assetBundle.LoadAsset<AudioClip>("bonfire_loop");
+            bonfireVol.loop = true;
+            bonfireVol.playOnAwake = true;
+            bonfireVol.rolloffMode = AudioRolloffMode.Linear;
+
+            var bonfireBreak = bonfireFab.GetComponent<WearNTear>();
+            bonfireBreak.m_destroyedEffect = breakStone;
+            bonfireBreak.m_hitEffect = hitTorch;
+
             var bonfireEffect = bonfireFab.GetComponent<Piece>();
             bonfireEffect.m_placeEffect = buildStone;
             PieceManager.Instance.AddPiece(bonfire);
