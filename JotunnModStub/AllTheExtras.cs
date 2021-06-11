@@ -62,7 +62,6 @@ namespace AllTheExtras
                 var sfxstonehit = PrefabManager.Cache.GetPrefab<GameObject>("sfx_rock_hit");
 
 
-                
                 buildStone = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxstone }, new EffectList.EffectData { m_prefab = vfxstone } } };
                 buildWood = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxwood }, new EffectList.EffectData { m_prefab = vfxwood } } };
                 buildTorch = new EffectList { m_effectPrefabs = new EffectList.EffectData[2] { new EffectList.EffectData { m_prefab = sfxmetal }, new EffectList.EffectData { m_prefab = vfxmetal } } };
@@ -100,8 +99,6 @@ namespace AllTheExtras
         {
             var torchFab = assetBundle.LoadAsset<GameObject>("rk_torchnew");
 
-            //piece_grill
-
             var torch = new CustomPiece(torchFab,
                 new PieceConfig
                 {
@@ -121,32 +118,17 @@ namespace AllTheExtras
             torchVol.playOnAwake = true;
             torchVol.loop = true;
             torchVol.rolloffMode = AudioRolloffMode.Linear;
-            //if (AudioMan.instance == null) Jotunn.Logger.LogError("lolwut");
-            //else torchVol.outputAudioMixerGroup = mixer;
+            //need to change to child, or add destroy
 
             var torchBreak = torchFab.GetComponent<WearNTear>();
             torchBreak.m_destroyedEffect = breakTorch;
             torchBreak.m_hitEffect = hitTorch;
-
-
-            //torchVol.outputAudioMixerGroup
-
 
             var torchEffect = torchFab.GetComponent<Piece>();
             torchEffect.m_placeEffect = buildTorch;
             PieceManager.Instance.AddPiece(torch);
         }
 
-        /*AudioSource torchVol;
-        {
-
-        torchVol = torchFab.AddComponent<AudioSource>();
-        torchVol.clip = assetBundle.LoadAsset<AudioClip>("torch_clip");
-            torchVol.playOnAwake = true;
-            torchVol.loop = true;
-            torchVol.outputAudioMixerGroup = AudioMan.instance.m_ambientMixer;
-
-        }*/
         private void LoadWindow()
         {
             var windowFab = assetBundle.LoadAsset<GameObject>("rk_window");
@@ -209,11 +191,13 @@ namespace AllTheExtras
                     }
 
                 });
-            bonfireVol = bonfireFab.AddComponent<AudioSource>();
+            //need to figure out how to change to child so only sound on "enabled"
+            //need to fix sound range
+            /*bonfireVol = bonfireFab.AddComponent<AudioSource>();
             bonfireVol.clip = assetBundle.LoadAsset<AudioClip>("bonfire_loop");
             bonfireVol.loop = true;
             bonfireVol.playOnAwake = true;
-            bonfireVol.rolloffMode = AudioRolloffMode.Linear;
+            bonfireVol.rolloffMode = AudioRolloffMode.Linear;*/
 
             var bonfireBreak = bonfireFab.GetComponent<WearNTear>();
             bonfireBreak.m_destroyedEffect = breakStone;
